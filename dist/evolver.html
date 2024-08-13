@@ -36,6 +36,12 @@
   #claude-warning a:active { color: #ffd37c; }
   #claude-warning a:visited { color: #a88a4e; }
   #claude-warning a:visited:hover { color: #fff0d3; }
+  #localhost-warning { color: #ffd37c; display: block; margin-top: 0px; }
+  #localhost-warning a { color: #ffd37c; }
+  #localhost-warning a:hover { color: #fff0d3; }
+  #localhost-warning a:active { color: #ffd37c; }
+  #localhost-warning a:visited { color: #a88a4e; }
+  #localhost-warning a:visited:hover { color: #fff0d3; }
   #settings-icons { cursor: pointer; width: 50px; user-select: none; }
   #settings-icons:hover { color: #6e6e70; }
   #settings-icons:active { color: #323232; }
@@ -45,9 +51,15 @@
 	.checkbox-container { display: inline-block; align-items: center; white-space: nowrap; justify-content: flex-start; }
 	.checkbox-container input { height: 20px; align-items: left; width: 20px; }
 	.checkbox-container label { margin-top: 10px; font-size: 18px; }
-	.api-key-group { display: flex; align-items: center; }
+	.api-key-group { display: none; align-items: center; }
 	.api-key-group h4 { margin-right: 10px; padding-bottom: 10px; }
 	.api-key-group input { flex: 1; }
+	.local-url-group { display: flex; align-items: center; }
+	.local-url-group h4 { margin-right: 10px; padding-bottom: 10px; }
+	.local-url-group input { flex: 1; }
+	.local-name-group { display: flex; align-items: center; }
+	.local-name-group h4 { margin-right: 10px; padding-bottom: 10px; }
+	.local-name-group input { flex: 1; }
 	.fa-edit { cursor: pointer; }
 	.source-code-window { position: absolute; top: 10%; left: 10%; width: 80%; height: 80%;  background-color: #212529; color: white; z-index: 100; align-items: center; justify-content: center; border: 5px solid rgb(82, 82, 82);}
 	.source-code-window h2 { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
@@ -79,6 +91,7 @@
     <h3>Model</h3>
     
     <select id="model">
+      <option value="ollama">Local Ollama</option>
       <option value="gpt-3.5-turbo">GPT 3.5</option>
       <option value="gpt-4">GPT 4</option>
       <option value="gpt-4o">GPT 4o</option>
@@ -94,7 +107,18 @@
       <h4>API Key</h4>
       <input type="password" id="apiKey" placeholder="(will not be saved)" required>
     </div>
-    <p id="claude-warning">Warning: You must disable CORS to use Claude 
+    <div class="local-url-group">
+      <h4>Local model URL</h4>
+      <input type="text" id="localModelUrl" placeholder="http://localhost:11434/api/chat">
+    </div>
+    <div class="local-model-group">
+      <h4>Local model name</h4>
+      <input type="text" id="localModelName" placeholder="llama3:latest">
+    </div>
+    <p id="localhost-warning">Warning: You must disable CORS to use Local Ollama
+      <a href="https://medium.com/@beligh.hamdi/run-chrome-browser-without-cors-872747142c61" target="_blank"><i class="fa fa-question-circle"></i></a>
+    </p>
+    <p id="claude-warning">Warning: You must disable CORS to use Claude
       <a href="https://medium.com/@beligh.hamdi/run-chrome-browser-without-cors-872747142c61" target="_blank"><i class="fa fa-question-circle"></i></a>
     </p>
     <div id="settings-icons">
@@ -465,6 +489,14 @@
 
     fillPrompts(systemPrompt, startPrompt, variationPrompt, fullCodingPrompt, splicePrompt);
 
+    function getValueOrPlaceholder(elementId) {
+      let el = document.getElementById(elementId).value;
+      if (el == '') {
+        el = document.getElementById(elementId).getAttribute('placeholder');
+      }
+      return el;
+    }
+
     const page_sources = [
       empty_page, // first is always the selected code
       empty_page,
@@ -473,11 +505,17 @@
     const generating_flags = [false, false, false];
     createPages(page_sources);
 
-
+    const LOCAL_MODELS = ["ollama"];
     let currentModel = document.getElementById('model').value;
+    let localModelUrl = getValueOrPlaceholder('localModelUrl');
+    let localModelName = getValueOrPlaceholder('localModelName');
     let gptAPIKey = '';
     let claudeAPIKey = '';
     let geminiAPIKey = '';
+
+    function isLocalModel(model) {
+      return LOCAL_MODELS.includes(model);
+    }
 
     const MAX_CALLS = 5;
     async function promptGPT(system, prompt) {
@@ -591,7 +629,46 @@
       return json.candidates[0].content.parts[0].text;
     }
 
-    let promptModel = promptGPT;
+    async function promptLocal(system, prompt) {
+      if (!localModelUrl) {
+        throw new Error('Local model not set');
+      }
+      if (!localModelName) {
+        throw new Error('Local model name not set');
+      }
+
+      let full_output = '';
+      let messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": prompt}
+      ];
+      if (full_output) {
+        messages.push({"role": "assistant", "content": full_output});
+      }
+
+      let body = {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: localModelName,
+          messages,
+          stream: false
+        })
+      };
+
+      let response = await fetch(localModelUrl, body);
+      if (!response.ok) {
+        let error = await response.text();
+        throw new Error('Failed to generate code: ' + error);
+      }
+
+      const data = await response.json();
+      return data.message.content;
+    }
+
+    let promptModel = promptLocal;
 
     async function generateFullCode(system, message, pageNumber) {
       if (generating_flags[pageNumber - 1])
@@ -713,7 +790,7 @@
     const generateButton = document.getElementById('generateButton');
     generateButton.addEventListener('click', () => {
       const apiKeySet = !!document.getElementById('apiKey').value;
-      if (!apiKeySet) {
+      if (!isLocalModel(currentModel) && !apiKeySet) {
         document.getElementById('apiKey').focus();
         return;
       }
@@ -797,7 +874,7 @@
       if (code === empty_page || code === generating_page) {
         return;
       }
-      if (!document.getElementById('apiKey').value) {
+      if (!isLocalModel(currentModel) && !document.getElementById('apiKey').value) {
         document.getElementById('apiKey').focus();
         return;
       }
@@ -820,8 +897,19 @@
     modelSelect.addEventListener('change', () => {
       currentModel = modelSelect.value;
       let apiKey = '';
+
       const claudeWarning = document.getElementById('claude-warning');
       claudeWarning.style.display = 'none';
+      const localhostWarning = document.getElementById('localhost-warning');
+      localhostWarning.style.display = 'none';
+
+      const apiKeyInput = document.getElementsByClassName('api-key-group')[0];
+      apiKeyInput.style.display = 'flex';
+      const localUrlInput = document.getElementsByClassName('local-url-group')[0];
+      localUrlInput.style.display = 'none';
+      const localNameInput = document.getElementsByClassName('local-name-group')[0];
+      localNameInput.style.display = 'none';
+
       if (currentModel.includes('claude')) {
         apiKey = claudeAPIKey;
         promptModel = promptClaude;
@@ -829,6 +917,12 @@
       } else if (currentModel.includes('gemini')) {
         apiKey = geminiAPIKey;
         promptModel = promptGemini;
+      } else if (isLocalModel(currentModel)) {
+        promptModel = promptLocal;
+        localhostWarning.style.display = 'block';
+        localUrlInput.style.display = 'flex';
+        localNameInput.style.display = 'flex';
+        apiKeyInput.style.display = 'none';
       } else {
         apiKey = gptAPIKey;
         promptModel = promptGPT;
