@@ -1,0 +1,74 @@
+body, html { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; display: flex; font-size: 18px; font-family: 'Roboto', sans-serif; }
+button { font-size: 18px; }
+.pages-container { width: 100%; display: flex; flex-direction: column; flex-grow: 1; }
+.page-container { height: 33.33%; display: flex; flex-direction: row; flex: 1; top: 0; }
+.iframe-container { border: none; box-sizing: border-box; flex-grow: 5; flex: 5; margin: -1px 0px -1px 0px;}
+iframe { width: 100%; height: 100%; border: none; }
+.console-container { display: flex; flex:2; flex-direction: column; box-sizing: border-box; border: 1px solid rgb(82, 82, 82); }
+.console-header { background-color: #343a40; justify-content: space-between; padding: 5px; display: flex; }
+.console-header button { background-color: #495057; color: #fff; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; align-items: center; flex: 1; }
+.console { background-color: #212529; color: #fff; padding: 10px; overflow-x: wrap; overflow-y: auto; font-family: monospace; box-sizing: border-box; flex: 1; }
+.console span { display: block; }
+.console span.error { color: #dc3545; }
+.edit-panel { background-color: #212529; color: #fff; padding: 10px; overflow-x: wrap; overflow-y: auto; font-family: monospace; box-sizing: border-box; flex: 1; display: none; }
+.control-panel { width: 30%; background-color: #212529; padding: 10px; box-sizing: border-box; color: white; overflow: auto; border: 1px solid rgb(82, 82, 82);}
+.control-panel input { width: 100%; height: 30px; background-color: #343a40; color: #fff; border: none; padding: 5px; box-sizing: border-box; margin-bottom: 10px; overflow: wrap; }
+.control-panel select { width: 100%; height: 30px; background-color: #343a40; color: #fff; border: none; padding: 5px; box-sizing: border-box; margin-bottom: 10px; }
+.control-panel button { width: 100%; height: 30px; background-color: #495057; color: #fff; border: none; padding: 5px; box-sizing: border-box; margin-bottom: 10px; cursor: pointer; }
+.control-panel hr { margin: 20px 0; background-color: #495057; border: none; height: 2px; }
+.control-panel .select-button-container { display: flex; justify-content: space-between; }
+.control-panel .select-button { background-color: #495057; color: white; border: none; padding: 5px 10px; margin-right: 5px; margin-left: 5px; }
+.control-panel .select-button:hover { background-color: #6e6e70; }
+.control-panel .select-button:active { background-color: #323232; }
+.control-panel span { border: 1px solid #495057; }
+.control-panel span:hover { border: 1px solid #8e8e90; }
+.control-panel .links { position: absolute; bottom: 1px; left: 1px; padding: 5px; font-size: 30px; background-color: #212529;}
+#claude-warning { color: #ffd37c; display: none; margin-top: 0px; }
+#claude-warning a { color: #ffd37c; }
+#claude-warning a:hover { color: #fff0d3; }
+#claude-warning a:active { color: #ffd37c; }
+#claude-warning a:visited { color: #a88a4e; }
+#claude-warning a:visited:hover { color: #fff0d3; }
+#localhost-warning { color: #ffd37c; display: block; margin-top: 0px; }
+#localhost-warning a { color: #ffd37c; }
+#localhost-warning a:hover { color: #fff0d3; }
+#localhost-warning a:active { color: #ffd37c; }
+#localhost-warning a:visited { color: #a88a4e; }
+#localhost-warning a:visited:hover { color: #fff0d3; }
+#settings-icons { cursor: pointer; width: 50px; user-select: none; }
+#settings-icons:hover { color: #6e6e70; }
+#settings-icons:active { color: #323232; }
+.variationPromptInput { background-color: #2a3035; display: block; margin-bottom: 10px; border: 1px solid #495057; padding: 3px; overflow: auto; box-sizing: border-box; white-space: pre-wrap; }
+.variationPromptInput:hover { border: 1px solid #8e8e90; }
+.generate-variations-button { width: 100%; height: 30px; background-color: #495057; color: #fff; border: none; padding: 5px; box-sizing: border-box; margin-bottom: 10px; cursor: pointer; }
+.checkbox-container { display: inline-block; align-items: center; white-space: nowrap; justify-content: flex-start; }
+.checkbox-container input { height: 20px; align-items: left; width: 20px; }
+.checkbox-container label { margin-top: 10px; font-size: 18px; }
+.api-key-group { display: none; align-items: center; }
+.api-key-group h4 { margin-right: 10px; padding-bottom: 10px; }
+.api-key-group input { flex: 1; }
+.local-url-group { display: flex; align-items: center; }
+.local-url-group h4 { margin-right: 10px; padding-bottom: 10px; }
+.local-url-group input { flex: 1; }
+.local-name-group { display: flex; align-items: center; }
+.local-name-group h4 { margin-right: 10px; padding-bottom: 10px; }
+.local-name-group input { flex: 1; }
+.fa-edit { cursor: pointer; }
+.source-code-window { position: absolute; top: 10%; left: 10%; width: 80%; height: 80%;  background-color: #212529; color: white; z-index: 100; align-items: center; justify-content: center; border: 5px solid rgb(82, 82, 82);}
+.source-code-window h2 { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
+.source-code-window button { background-color: #495057; color: white; cursor: pointer; border: none; cursor: pointer; }
+.source-code-window button:hover { background-color: #6e6e70; }
+.source-code-window #close-source-code-window { position: absolute; top: 10px; right: 10px; padding: 5px 10px; }
+.source-code-bottom-buttons-container { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
+.source-code-bottom-button { border: none; padding: 5px 10px; min-width: 200px;}
+.source-code-window span { width: 90%; height: 80%; left: 5%; top: 10%; position: absolute; overflow: auto; padding: 10px; box-sizing: border-box; border: 1px solid #495057; white-space: pre-wrap; }
+.source-code-window span:hover { border: 1px solid #8e8e90; }
+.start-window { position: absolute; top: 25%; left: 25%; width: 50%; height: 50%;  background-color: #212529; color: white; z-index: 100; align-items: center; justify-content: center; border: 5px solid rgb(82, 82, 82);}
+.close-start-window { position: absolute; top: 10px; right: 10px; background-color: #495057; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+.generate-button { position: absolute; bottom: 10px; width: 70%; left: 50%; transform: translateX(-50%); background-color: #495057; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+#start-window h3 { margin-left: 50px; }
+.start-window span { background-color: #2a3035; width: 90%; height: 60%; left: 3.5%; position: absolute; padding: 10px; border: 1px solid #495057; }
+.start-window span:hover { border: 1px solid #8e8e90; }
+#bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 2px; background-color: black; } /* covers weird bottom iframe border */
+button:hover { background-color: #6e6e70; }
+button:active { background-color: #323232; }
